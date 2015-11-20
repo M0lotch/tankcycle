@@ -1,5 +1,6 @@
 from datetime import datetime
 import matplotlib.pyplot as plt
+import matplotlib.dates as date2num
 import shelve
 
 tank_list = shelve.open("tanks.txt", flag="c")
@@ -69,11 +70,13 @@ def graph_parameters(tank):
     y_ammonia = []
     y_nitrite = []
     y_nitrate = []
+    fig = plt.figure()
+    graph = fig.add_subplot(111)
     try:
         for param in param_list:
             if param_list[param].tank_name == tank:
                 x_point = param_list[param].date
-                x_point = x_point.replace("/", "")
+                x_point = datetime.strptime(x_point, "%m/%d/%y")
                 x.append(x_point)
                 y_ammonia.append(param_list[param].ammonia)
                 y_nitrite.append(param_list[param].nitrite)
@@ -82,12 +85,14 @@ def graph_parameters(tank):
         print("I don't have any recorded parameters for the tank named {}."
               .format(tank))
 
-    plt.plot(x, y_ammonia, label="ammonia")
-    plt.plot(x, y_nitrite, label="nitrite")
-    plt.plot(x, y_nitrate, label="nitrate")
+    graph.plot(x, y_ammonia, label="ammonia")
+    graph.plot(x, y_nitrite, label="nitrite")
+    graph.plot(x, y_nitrate, label="nitrate")
+    graph.set_xticks(x)
+    graph.set_xticklabels([date.strftime('%m/%d/%y') for date in x])
     plt.xlabel("Dates")
     plt.ylabel("Parameters")
-    plt.legend()
+    graph.legend()
     plt.show()
 
 
